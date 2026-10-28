@@ -17,6 +17,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Controller
 public class HomeController {
 
+    private static final int PAGE_SIZE = 10;
+
     private final TodoService todoService;
 
     public HomeController(TodoService todoService) {
@@ -32,15 +34,31 @@ public class HomeController {
     @GetMapping("/todos")
     public String todos(@RequestParam(required = false) String keyword,
             @RequestParam(required = false) String category,
-            @RequestParam(required = false, defaultValue = "asc") String order, Model model) {
+            @RequestParam(required = false, defaultValue = "asc") String order,
+            @RequestParam(required = false, defaultValue = "false") boolean includeCompleted,
+            @RequestParam(required = false, defaultValue = "0") int trash,
+            @RequestParam(required = false, defaultValue = "1") int page, Model model) {
         if (!"desc".equals(order)) {
             order = "asc";
         }
-        List<Todo> todos = todoService.search(keyword, category, order);
+        if (page < 1) {
+            page = 1;
+        }
+        boolean showTrash = trash == 1;
+        boolean effectiveIncludeCompleted = showTrash || includeCompleted;
+        int totalPages = Math.max(1, (int) Math.ceil((double) todoService.count(keyword, category, effectiveIncludeCompleted, showTrash) / PAGE_SIZE));
+        if (page > totalPages) {
+            page = totalPages;
+        }
+        List<Todo> todos = todoService.searchPage(keyword, category, order, effectiveIncludeCompleted, showTrash, PAGE_SIZE, page);
         model.addAttribute("todos", todos);
         model.addAttribute("keyword", keyword);
         model.addAttribute("category", category);
         model.addAttribute("order", order);
+        model.addAttribute("includeCompleted", effectiveIncludeCompleted);
+        model.addAttribute("trash", showTrash);
+        model.addAttribute("page", page);
+        model.addAttribute("totalPages", totalPages);
         return "todos";
     }
 
@@ -121,5 +139,17 @@ public class HomeController {
         todoService.delete(id);
         redirectAttributes.addFlashAttribute("message", "削除しました");
         return "redirect:/todos";
+    }
+
+    @PostMapping("/todos/{id}/restore")
+    public String restore(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
+        Todo todo = todoService.findDeletedById(id);
+        if (todo == null) {
+            redirectAttributes.addFlashAttribute("message", "見つかりませんでした");
+            return "redirect:/todos?trash=1";
+        }
+        todoService.restore(id);
+        redirectAttributes.addFlashAttribute("message", "戻しました");
+        return "redirect:/todos?trash=1";
     }
 }

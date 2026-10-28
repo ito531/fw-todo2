@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>今日のフォーカス</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <main class="container">
+        <p class="flash" th:if="${message}" th:text="${message}">完了にしました。</p>
+        <div class="focus-heading">
+            <div>
+                <p class="eyebrow" th:text="${#temporals.format(today, 'yyyy年M月d日')}">今日</p>
+                <h1 class="page-title">今日のフォーカス</h1>
+            </div>
+            <a class="btn sub" th:href="@{/todos}">一覧に戻る</a>
+        </div>
+
+        <section class="focus-summary" aria-label="今日の進捗">
+            <div class="focus-progress-card">
+                <p class="focus-label">今日が期限のタスク</p>
+                <p class="focus-number"><span th:text="${todayCompleted}">0</span> / <span th:text="${todayTotal}">0</span></p>
+                <div class="progress-track" aria-hidden="true">
+                    <div class="progress-bar" th:style="|width: ${todayTotal == 0 ? 0 : todayCompleted * 100 / todayTotal}%|"></div>
+                </div>
+            </div>
+            <div class="focus-alert-card" th:classappend="${overdueCount == 0} ? ' is-clear'">
+                <p class="focus-label">期限切れ</p>
+                <p class="focus-number"><span th:text="${overdueCount}">0</span><small> 件</small></p>
+                <p th:text="${overdueCount == 0 ? 'すべて順調です！' : '先に片付けると気持ちが楽になります'}">すべて順調です！</p>
+            </div>
+        </section>
+
+        <section class="focus-list-section">
+            <h2>次に取り組むこと</h2>
+            <p class="focus-description">期限切れ・今日の期限・優先度の順に、最大5件を自動で選びました。</p>
+            <p th:if="${#lists.isEmpty(focusTodos)}" class="focus-empty">未完了のタスクはありません。すばらしい！</p>
+            <ol class="focus-list" th:unless="${#lists.isEmpty(focusTodos)}">
+                <li th:each="todo : ${focusTodos}" class="focus-item" th:classappend="${todo.dueDate != null and todo.dueDate.isBefore(today)} ? ' is-overdue'">
+                    <div class="focus-task">
+                        <a class="focus-title" th:href="@{/todos/{id}/edit(id=${todo.id})}" th:text="${todo.title}">タスク名</a>
+                        <p class="focus-meta">
+                            <span th:text="${todo.category}">ジャンル</span>
+                            <span th:text="${todo.priority == 1 ? '優先度: 高' : (todo.priority == 2 ? '優先度: 中' : '優先度: 低')}">優先度: 中</span>
+                            <span th:text="${todo.dueDate == null ? '期限なし' : '期限: ' + todo.dueDate}">期限</span>
+                        </p>
+                    </div>
+                    <form th:action="@{/focus/{id}/complete(id=${todo.id})}" method="post">
+                        <button class="btn" type="submit">完了にする</button>
+                    </form>
+                </li>
+            </ol>
+        </section>
+    </main>
+</body>
+</html>

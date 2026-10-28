@@ -7,12 +7,17 @@
 </head>
 <body>
     <main class="container">
-        <h1 class="page-title" th:text="${currentMonth.year + '年' + currentMonth.monthValue + '月'}">2026年4月</h1>
+        <h1 class="page-title" th:if="${view == 'month'}" th:text="${currentMonth.year + '年' + currentMonth.monthValue + '月'}">2026年4月</h1>
+        <h1 class="page-title" th:if="${view == 'week'}" th:text="${weekStart + ' 〜 ' + weekEnd}">2026-04-05 〜 2026-04-11</h1>
 
         <nav class="calendar-navigation" aria-label="月の移動">
             <div class="calendar-navigation-group">
-                <a class="link" th:href="@{/calendar(year=${previousMonth.year}, month=${previousMonth.monthValue})}">前の月</a>
-                <a class="link" th:href="@{/calendar(year=${nextMonth.year}, month=${nextMonth.monthValue})}">次の月</a>
+                <a class="link" th:if="${view == 'month'}" th:href="@{/calendar(year=${previousMonth.year}, month=${previousMonth.monthValue})}">前の月</a>
+                <a class="link" th:if="${view == 'month'}" th:href="@{/calendar(year=${nextMonth.year}, month=${nextMonth.monthValue})}">次の月</a>
+                <a class="link" th:if="${view == 'week'}" th:href="@{/calendar(view='week', date=${previousWeek})}">前の週</a>
+                <a class="link" th:if="${view == 'week'}" th:href="@{/calendar(view='week', date=${nextWeek})}">次の週</a>
+                <a class="link" th:if="${view == 'month'}" th:href="@{/calendar(view='week', date=${currentMonth.atDay(1)})}">週表示</a>
+                <a class="link" th:if="${view == 'week'}" th:href="@{/calendar(year=${weekStart.year}, month=${weekStart.monthValue})}">月表示</a>
             </div>
             <div class="calendar-navigation-group">
                 <a class="link" th:href="@{/todos}">表で見る</a>
@@ -20,8 +25,9 @@
             </div>
         </nav>
 
+        <div class="calendar-card">
         <table class="calendar-table"
-                th:attr="data-from=${currentMonth.atDay(1)},data-to=${currentMonth.atEndOfMonth()}">
+                th:attr="data-from=${from},data-to=${to},data-view=${view}">
             <thead>
                 <tr>
                     <th scope="col">日</th>
@@ -44,12 +50,14 @@
                 </tr>
             </tbody>
         </table>
+        </div>
     </main>
     <script>
         (async function () {
             const calendar = document.querySelector("table[data-from]");
             const from = calendar.dataset.from;
             const to = calendar.dataset.to;
+            const isWeekView = calendar.dataset.view === "week";
             const res = await fetch(`/api/todos?${new URLSearchParams({ from, to })}`);
             const todos = await res.json();
             const holidayRes = await fetch(`/api/holidays?${new URLSearchParams({ from, to })}`);
@@ -78,7 +86,8 @@
                     cell.title = holidays[date];
                 }
                 const cellTodos = todos.filter((todo) => todo.dueDate === date);
-                cellTodos.slice(0, 3).forEach((todo) => {
+                const visibleTodos = isWeekView ? cellTodos : cellTodos.slice(0, 3);
+                visibleTodos.forEach((todo) => {
                     const title = document.createElement("a");
                     title.classList.add("link", "calendar-todo-link");
                     title.href = `/todos/${todo.id}/edit`;
@@ -88,7 +97,7 @@
                     }
                     cell.append(title);
                 });
-                if (cellTodos.length > 3) {
+                if (!isWeekView && cellTodos.length > 3) {
                     const more = document.createElement("p");
                     more.textContent = `ほか ${cellTodos.length - 3}件`;
                     cell.append(more);
