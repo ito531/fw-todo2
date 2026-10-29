@@ -2,6 +2,7 @@ package com.example.todoapp2;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -31,6 +32,9 @@ public class Todo {
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate dueDate;
+
+    @DateTimeFormat(pattern = "HH:mm")
+    private LocalTime dueTime;
 
     private Boolean completed;
     private LocalDateTime deletedAt;

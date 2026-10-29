@@ -12,6 +12,7 @@
       category,
       priority,
       due_date,
+      due_time,
       completed,
       deleted_at,
       created_at,
@@ -83,6 +84,7 @@
       category,
       priority,
       due_date,
+      due_time,
       completed,
       deleted_at,
       created_at,
@@ -100,6 +102,7 @@
       category,
       priority,
       due_date,
+      due_time,
       completed,
       deleted_at,
       created_at,
@@ -116,6 +119,7 @@
       category,
       priority,
       due_date,
+      due_time,
       completed
     ) VALUES (
       #{title},
@@ -123,6 +127,7 @@
       #{category},
       #{priority},
       #{dueDate},
+      #{dueTime},
       COALESCE(#{completed}, FALSE)
     )
   </insert>
@@ -135,6 +140,7 @@
       category = #{category},
       priority = #{priority},
       due_date = #{dueDate},
+      due_time = #{dueTime},
       completed = #{completed}
     WHERE id = #{id}
       AND deleted_at IS NULL

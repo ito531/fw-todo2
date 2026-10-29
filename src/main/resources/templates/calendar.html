@@ -85,13 +85,15 @@
                     cell.classList.add("calendar-holiday");
                     cell.title = holidays[date];
                 }
-                const cellTodos = todos.filter((todo) => todo.dueDate === date);
+                const cellTodos = todos.filter((todo) => todo.dueDate === date)
+                    .sort((first, second) => (first.dueTime ?? "99:99").localeCompare(second.dueTime ?? "99:99"));
+                const showDueTime = cellTodos.length > 1;
                 const visibleTodos = isWeekView ? cellTodos : cellTodos.slice(0, 3);
                 visibleTodos.forEach((todo) => {
                     const title = document.createElement("a");
                     title.classList.add("link", "calendar-todo-link");
                     title.href = `/todos/${todo.id}/edit`;
-                    title.textContent = todo.title;
+                    title.textContent = showDueTime && todo.dueTime ? `${todo.dueTime} ${todo.title}` : todo.title;
                     if (todo.dueDate < today && !todo.completed) {
                         title.classList.add("calendar-overdue");
                     }

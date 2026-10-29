@@ -179,6 +179,7 @@ public class TodoApiController {
         todo.setCategory(request.getCategory());
         todo.setPriority(request.getPriority());
         todo.setDueDate(request.getDueDate());
+        todo.setDueTime(request.getDueTime());
         todo.setCompleted(request.getCompleted());
         return todo;
     }

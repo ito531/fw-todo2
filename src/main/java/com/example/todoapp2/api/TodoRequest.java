@@ -1,6 +1,7 @@
 package com.example.todoapp2.api;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -25,5 +26,6 @@ public class TodoRequest {
     private Integer priority;
 
     private LocalDate dueDate;
+    private LocalTime dueTime;
     private Boolean completed;
 }

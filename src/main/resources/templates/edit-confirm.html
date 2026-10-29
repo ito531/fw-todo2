@@ -16,12 +16,15 @@
         <p class="confirm-value">期限：<span th:text="${todo.dueDate == null ? '（入力なし）' : todo.dueDate}">期限</span></p>
         <p class="confirm-value">完了：<span th:text="${todo.completed == null ? '（入力なし）' : (todo.completed ? '完了' : '未完了')}">完了</span></p>
 
+        <p class="confirm-value">期限時刻：<span th:text="${todo.dueTime == null ? '未入力' : todo.dueTime}">期限時刻</span></p>
+
         <form th:action="@{/todos/{id}(id=${id})}" th:object="${todo}" method="post">
             <input type="hidden" th:field="*{title}">
             <input type="hidden" th:field="*{detail}">
             <input type="hidden" th:field="*{category}">
             <input type="hidden" th:field="*{priority}">
             <input type="hidden" th:field="*{dueDate}">
+            <input type="hidden" th:field="*{dueTime}">
             <input type="hidden" th:field="*{completed}">
 
             <div class="confirm-actions">

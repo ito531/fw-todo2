@@ -52,8 +52,15 @@
             </div>
 
             <div class="form-row">
-                <label class="form-label" for="completed">完了</label>
-                <input class="form-input" id="completed" type="checkbox" th:field="*{completed}">
+                <label class="form-label" for="dueTime">期限時刻</label>
+                <input class="form-input" id="dueTime" type="time" th:field="*{dueTime}">
+            </div>
+
+            <div class="form-row completed-row">
+                <label class="completed-check" for="completed">
+                    <input id="completed" type="checkbox" th:field="*{completed}">
+                    <span>このやることを完了にする</span>
+                </label>
             </div>
 
             <button class="btn" type="submit">確認する</button>

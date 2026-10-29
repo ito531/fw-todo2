@@ -51,6 +51,11 @@
                 <input class="form-input" id="dueDate" type="date" th:field="*{dueDate}">
             </div>
 
+            <div class="form-row">
+                <label class="form-label" for="dueTime">期限時刻</label>
+                <input class="form-input" id="dueTime" type="time" th:field="*{dueTime}">
+            </div>
+
             <button class="btn" type="submit">確認する</button>
             <a class="btn sub" th:href="@{/todos}">一覧へ</a>
         </form>
